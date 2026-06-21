@@ -28,8 +28,8 @@ def create_student():
 
     db.session.add(student)
     logging.info(
-    f"Creating student {student.email}"
-)
+        f"Creating student {student.email}"
+    )
     db.session.commit()
 
     return {
@@ -104,8 +104,8 @@ def update_student(id):
     student.age = data["age"]
 
     logging.info(
-    f"Updating student {id}"
-)
+        f"Updating student {id}"
+    )
 
     db.session.commit()
 
@@ -131,8 +131,8 @@ def delete_student(id):
     db.session.delete(student)
 
     logging.info(
-    f"Deleting student {id}"
-)
+        f"Deleting student {id}"
+    )
     db.session.commit()
 
     return {
