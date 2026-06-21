@@ -2,20 +2,13 @@
 
 ## Overview
 
-This project is a REST API for managing student records built using:
+Student CRUD REST API is a backend application built using **Python, Flask, PostgreSQL, SQLAlchemy ORM, Docker, Docker Compose, and GNU Make**.
 
-* Python
-* Flask
-* PostgreSQL
-* SQLAlchemy ORM
-* Flask-Migrate
-* Docker
-
-The API supports creating, reading, updating, and deleting student records and demonstrates backend development, database integration, testing, and containerization.
+The project provides REST endpoints to create, retrieve, update, and delete student records while following backend development and DevOps best practices.
 
 ---
 
-## Features
+# Features
 
 * Create Student
 * Get All Students
@@ -28,84 +21,107 @@ The API supports creating, reading, updating, and deleting student records and d
 * Database Migrations using Flask-Migrate
 * Environment Variable Configuration
 * Logging
-* Unit Testing with Pytest
+* Unit Testing using Pytest
 * Docker Containerization
 * Multi-stage Docker Build
+* Docker Compose for Multi-Container Setup
+* One-Click Local Development using Makefile
 
 ---
 
-## Tech Stack
+# Tech Stack
 
-| Technology    | Purpose              |
-| ------------- | -------------------- |
-| Python        | Programming Language |
-| Flask         | REST API Framework   |
-| PostgreSQL    | Database             |
-| SQLAlchemy    | ORM                  |
-| Flask-Migrate | Database Migrations  |
-| Pytest        | Testing              |
-| Docker        | Containerization     |
+| Technology     | Purpose                    |
+| -------------- | -------------------------- |
+| Python         | Programming Language       |
+| Flask          | REST API Framework         |
+| PostgreSQL     | Relational Database        |
+| SQLAlchemy     | ORM                        |
+| Flask-Migrate  | Database Migrations        |
+| Pytest         | Unit Testing               |
+| Docker         | Containerization           |
+| Docker Compose | Multi-Container Management |
+| GNU Make       | Task Automation            |
 
 ---
 
-## Project Structure
+# Project Structure
 
+```text
 student-api/
 
 ├── app/
-
-│ ├── config/
-
-│ ├── models/
-
-│ ├── routes/
-
-│ └── **init**.py
-
+│   ├── config/
+│   ├── models/
+│   ├── routes/
+│   └── __init__.py
+│
 ├── migrations/
-
 ├── tests/
-
 ├── Dockerfile
-
+├── docker-compose.yml
 ├── Makefile
-
 ├── .dockerignore
-
-├── run.py
-
 ├── requirements.txt
-
+├── run.py
 ├── README.md
-
 └── .env
+```
 
 ---
 
-## Setup
+# Prerequisites
 
-### Clone Repository
+Before running the project, make sure the following tools are installed:
+
+* Docker Desktop
+* Docker Compose
+* Python 3.x
+* Git
+* GNU Make (optional for Windows)
+
+Verify installations:
+
+```bash
+docker --version
+docker compose version
+python --version
+git --version
+```
+
+---
+
+# Setup
+
+## Clone Repository
 
 ```bash
 git clone <repository-url>
+
 cd student-api
 ```
 
-### Create Virtual Environment
+---
+
+## Create Virtual Environment
 
 ```bash
 python -m venv venv
 ```
 
-### Activate Virtual Environment
+---
 
-#### Windows
+## Activate Virtual Environment
+
+### Windows
 
 ```bash
 venv\Scripts\activate
 ```
 
-### Install Dependencies
+---
+
+## Install Dependencies
 
 ```bash
 pip install -r requirements.txt
@@ -113,7 +129,7 @@ pip install -r requirements.txt
 
 ---
 
-## Environment Variables
+# Environment Variables
 
 Create a `.env` file in the project root.
 
@@ -129,21 +145,9 @@ DB_PASSWORD=<your-db-password>
 
 ---
 
-## Database Migration
+# Database Migration
 
-Initialize migrations:
-
-```bash
-flask --app run.py db init
-```
-
-Create migration:
-
-```bash
-flask --app run.py db migrate -m "create students table"
-```
-
-Apply migration:
+Apply database migrations:
 
 ```bash
 flask --app run.py db upgrade
@@ -151,13 +155,77 @@ flask --app run.py db upgrade
 
 ---
 
-## Run Application
+# Local Development
+
+## Start PostgreSQL Container
+
+```bash
+make start-db
+```
+
+---
+
+## Run Database Migrations
+
+```bash
+make migrate
+```
+
+---
+
+## Build REST API Docker Image
+
+```bash
+make build-api
+```
+
+---
+
+## Run REST API
+
+```bash
+make run-api
+```
+
+---
+
+# Execution Order
+
+Running
+
+```bash
+make run-api
+```
+
+performs the following steps automatically:
+
+```text
+make run-api
+        │
+        ▼
+start-db
+        │
+        ▼
+migrate
+        │
+        ▼
+build-api
+        │
+        ▼
+docker compose up -d
+```
+
+This provides a one-click local development setup.
+
+---
+
+# Run Application (Without Docker)
 
 ```bash
 python run.py
 ```
 
-Application runs on:
+Application URL:
 
 ```text
 http://localhost:5000
@@ -165,15 +233,15 @@ http://localhost:5000
 
 ---
 
-## API Endpoints
+# API Endpoints
 
-### Health Check
+## Health Check
 
-```http
+```
 GET /healthcheck
 ```
 
-Response:
+Response
 
 ```json
 {
@@ -183,13 +251,13 @@ Response:
 
 ---
 
-### Create Student
+## Create Student
 
-```http
+```
 POST /api/v1/students
 ```
 
-Request Body:
+Request
 
 ```json
 {
@@ -199,7 +267,7 @@ Request Body:
 }
 ```
 
-Response:
+Response
 
 ```json
 {
@@ -210,35 +278,35 @@ Response:
 
 ---
 
-### Get All Students
+## Get All Students
 
-```http
+```
 GET /api/v1/students
 ```
 
 ---
 
-### Get Student By ID
+## Get Student By ID
 
-```http
+```
 GET /api/v1/students/<id>
 ```
 
-Example:
+Example
 
-```http
+```
 GET /api/v1/students/1
 ```
 
 ---
 
-### Update Student
+## Update Student
 
-```http
+```
 PUT /api/v1/students/<id>
 ```
 
-Example Request:
+Example Request
 
 ```json
 {
@@ -249,23 +317,23 @@ Example Request:
 
 ---
 
-### Delete Student
+## Delete Student
 
-```http
+```
 DELETE /api/v1/students/<id>
 ```
 
 ---
 
-## Running Tests
+# Running Tests
 
-Run all tests:
+Execute unit tests:
 
 ```bash
 pytest
 ```
 
-Expected output:
+Expected Output:
 
 ```text
 2 passed
@@ -273,39 +341,47 @@ Expected output:
 
 ---
 
-## Docker
+# Docker
 
-### Build Docker Image
+## Build Docker Image
 
 ```bash
 docker build -t student-api:1.0.0 .
 ```
 
-### View Docker Images
+---
+
+## Start Services
 
 ```bash
-docker images
+docker compose up -d
 ```
 
-### Run Docker Container
+---
+
+## Stop Services
 
 ```bash
-docker run -p 5000:5000 \
--e DB_HOST=host.docker.internal \
--e DB_PORT=5432 \
--e DB_NAME=studentdb \
--e DB_USER=<your-db-user> \
--e DB_PASSWORD=<your-db-password> \
-student-api:1.0.0
+docker compose down
 ```
 
-### Verify API Running
+---
+
+## View Running Containers
+
+```bash
+docker ps
+```
+
+---
+
+## Verify API
 
 ```bash
 curl http://localhost:5000/healthcheck
 ```
 
-Response:
+Expected Response
 
 ```json
 {
@@ -315,55 +391,53 @@ Response:
 
 ---
 
-## Makefile Commands
+# Makefile Commands
 
-Install dependencies:
-
-```bash
-make install
-```
-
-Run application:
-
-```bash
-make run
-```
-
-Run tests:
-
-```bash
-make test
-```
-
-Build Docker image:
-
-```bash
-make docker-build
-```
-
-Run Docker container:
-
-```bash
-make docker-run
-```
+| Command        | Description                  |
+| -------------- | ---------------------------- |
+| make install   | Install project dependencies |
+| make run       | Run Flask application        |
+| make test      | Execute unit tests           |
+| make start-db  | Start PostgreSQL container   |
+| make migrate   | Apply database migrations    |
+| make build-api | Build Docker image           |
+| make run-api   | Start complete application   |
 
 ---
 
-## Security
+# Security
 
 * Do not commit `.env` files to GitHub.
-* Store database passwords securely.
-* Inject environment variables at runtime.
-* Keep secrets out of Docker images.
+* Never store database passwords in source code.
+* Use environment variables for sensitive information.
+* Use `.dockerignore` and `.gitignore` to exclude unnecessary files.
 
 ---
 
-## Future Enhancements
+# Future Enhancements
 
-* Docker Compose
-* CI/CD Pipeline
+* CI Pipeline using GitHub Actions
+* Bare Metal Deployment
 * Kubernetes Deployment
 * Helm Charts
-* ArgoCD
-* Monitoring and Alerting
-* Observability Dashboard
+* ArgoCD Continuous Deployment
+* Observability Stack
+* Dashboards and Alerts
+
+---
+
+# Author
+
+**Aditya**
+
+Student CRUD REST API Project built for learning:
+
+* Backend Development
+* DevOps
+* Docker
+* Docker Compose
+* PostgreSQL
+* SQLAlchemy ORM
+* CI/CD
+* Kubernetes
+* Cloud Engineering

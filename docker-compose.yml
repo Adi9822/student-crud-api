@@ -1,0 +1,36 @@
+services:
+
+  db:
+    image: postgres:16
+    container_name: student-db
+
+    environment:
+      POSTGRES_DB: studentdb
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+
+    ports:
+      - "5432:5432"
+
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  api:
+    image: student-api:1.0.0
+    container_name: student-api
+
+    depends_on:
+      - db
+
+    environment:
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_NAME: studentdb
+      DB_USER: postgres
+      DB_PASSWORD: postgres
+
+    ports:
+      - "5000:5000"
+
+volumes:
+  postgres_data:

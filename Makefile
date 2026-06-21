@@ -10,6 +10,13 @@ test:
 migrate:
 	flask --app run.py db upgrade
 
+build-api:
+	docker build -t student-api:1.0.0 .
+
+run-api: 
+	start-db migrate build-api
+	docker compose up -d
+
 docker-build:
 	docker build -t student-api:1.0.0 .
 
