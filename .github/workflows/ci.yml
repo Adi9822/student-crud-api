@@ -35,6 +35,12 @@ jobs:
         run: docker build -t student-api:1.0.0 .
 
       - name: Run Tests
+        env:
+          DB_HOST: localhost
+          DB_PORT: 5432
+          DB_NAME: studentdb
+          DB_USER: ${{ secrets.DB_USER }}
+          DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
         run: pytest
 
       - name: Run Lint

@@ -1,0 +1,5 @@
+[33m62e6449[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m)[m Fix GitHub Actions workflow indentation
+[33me8dba77[m Add GitHub Actions CI pipeline
+[33m964d1c3[m Add flake8 linting and fix code style
+[33ma70ed3c[m Setup one-click local development using Docker Compose and Makefile
+[33m01701e5[m Containerized Student API using Docker
