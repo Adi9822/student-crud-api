@@ -11,6 +11,7 @@ on:
       - "Makefile"
       - "requirements.txt"
       - "run.py"
+      - ".github/workflows/**"
 
 jobs:
   build-test-lint-docker:
