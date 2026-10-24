@@ -66,7 +66,24 @@ jobs:
       - name: Run Lint
         run: flake8 app tests
 
+      
+      - name: Install Helm
+        shell: powershell
+        run: |
+          $url = "https://get.helm.sh/helm-v3.17.3-windows-amd64.zip"
+          $zip = "$env:TEMP\helm.zip"
+          $dest = "$env:RUNNER_TEMP\helm"
+          Invoke-WebRequest -Uri $url -OutFile $zip
+          Expand-Archive -Path $zip -DestinationPath $dest -Force
+          $helmExe = Join-Path $dest "windows-amd64\helm.exe"
+          if (!(Test-Path $helmExe)) {
+            throw "Helm executable was not found after extraction."
+          }
+          Add-Content -Path $env:GITHUB_PATH -Value (Split-Path $helmExe)
+          & $helmExe version
+
       - name: Validate Helm Charts
+        shell: powershell
         run: |
           helm lint ./helm/postgres
           helm lint ./helm/student-api
