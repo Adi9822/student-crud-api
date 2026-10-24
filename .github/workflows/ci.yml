@@ -32,6 +32,22 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
+      - name: Diagnose Docker Access
+        continue-on-error: true
+        shell: powershell
+        run: |
+          Write-Host "=== Runner identity ==="
+          whoami
+
+          Write-Host "=== Docker context ==="
+          docker context show
+
+          Write-Host "=== Docker environment settings ==="
+          Get-ChildItem Env:DOCKER_* -ErrorAction SilentlyContinue
+
+          Write-Host "=== Docker client and server access ==="
+          docker version
+
       - name: Build API
         run: docker build -t student-api:1.0.0 .
 
