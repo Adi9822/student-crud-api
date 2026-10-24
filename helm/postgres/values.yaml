@@ -1,0 +1,38 @@
+replicaCount: 1
+
+image:
+  repository: postgres
+  tag: "16"
+  pullPolicy: IfNotPresent
+
+nameOverride: ""
+fullnameOverride: "postgres"
+
+service:
+  port: 5432
+
+database:
+  name: studentdb
+  existingSecret: student-api-db-secret
+  usernameKey: username
+  passwordKey: password
+
+persistence:
+  enabled: true
+  size: 2Gi
+  accessMode: ReadWriteOnce
+  mountPath: /var/lib/postgresql/data
+  existingClaim: data-postgres-0
+
+nodeSelector:
+  type: database
+
+readinessProbe:
+  initialDelaySeconds: 5
+  periodSeconds: 5
+
+livenessProbe:
+  initialDelaySeconds: 20
+  periodSeconds: 10
+
+resources: {}

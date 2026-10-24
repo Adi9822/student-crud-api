@@ -1,0 +1,6 @@
+apiVersion: v2
+name: postgres
+description: Helm chart for the PostgreSQL database used by the Student CRUD API
+type: application
+version: 0.1.0
+appVersion: "16"

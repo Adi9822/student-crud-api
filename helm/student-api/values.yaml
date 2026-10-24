@@ -1,0 +1,57 @@
+﻿replicaCount: 1
+
+image:
+  repository: student-api
+  tag: "1.0.0"
+  pullPolicy: IfNotPresent
+
+nameOverride: ""
+fullnameOverride: "student-api"
+
+service:
+  type: ClusterIP
+  port: 5000
+  targetPort: http
+
+database:
+  host: postgres
+  port: 5432
+  name: studentdb
+  existingSecret: student-api-db-secret
+  usernameKey: username
+  passwordKey: password
+
+migration:
+  enabled: true
+  command:
+    - flask
+    - --app
+    - run.py
+    - db
+    - upgrade
+
+containerPort: 5000
+
+readinessProbe:
+  httpGet:
+    path: /healthcheck
+    port: http
+  initialDelaySeconds: 5
+  periodSeconds: 5
+
+livenessProbe:
+  httpGet:
+    path: /healthcheck
+    port: http
+  initialDelaySeconds: 15
+  periodSeconds: 10
+
+nodeSelector:
+  type: application
+
+tolerations:
+  - key: node-role.kubernetes.io/control-plane
+    operator: Exists
+    effect: NoSchedule
+
+resources: {}

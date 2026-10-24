@@ -551,3 +551,69 @@ kubectl describe externalsecret student-api-db-credentials -n student-api
 Do not commit passwords, Vault tokens, or `.env` files to GitHub.
 
 **Note:** The Vault development configuration is for learning only. Its in-memory data may be lost when Vault restarts.
+
+# Helm Deployment (Milestone 8)
+
+## Helm Chart Structure
+
+The project contains two Helm charts:
+
+- `helm/postgres` — PostgreSQL StatefulSet, headless Service, ConfigMap, and persistent storage.
+- `helm/student-api` — Flask REST API Deployment, Service, configuration, and database migration init container.
+
+Both charts use the existing `student-api-db-secret` created by External Secrets Operator (ESO). Vault, ESO, and the ExternalSecret must be configured before deploying the application.
+
+## Validate the Charts
+
+Run these commands from the project root:
+
+```powershell
+helm lint .\helm\postgres
+helm lint .\helm\student-api
+
+helm template postgres .\helm\postgres --namespace student-api
+helm template student-api .\helm\student-api --namespace student-api
+```
+
+## Install or Upgrade the Releases
+
+```powershell
+helm upgrade --install postgres .\helm\postgres --namespace student-api --create-namespace --wait --timeout 5m
+
+helm upgrade --install student-api .\helm\student-api --namespace student-api --wait --timeout 5m
+```
+
+If Kubernetes resources already exist from standalone manifests, review the rendered charts and resource differences before adopting them into Helm.
+
+## Verify Deployment and Test
+
+```powershell
+helm list -n student-api
+helm status postgres -n student-api
+helm status student-api -n student-api
+
+kubectl get deployment,statefulset,pods,services,pvc -n student-api
+kubectl rollout status deployment/student-api -n student-api --timeout=180s
+
+helm test student-api -n student-api
+```
+
+## Access the Health Endpoint
+
+Start port forwarding in one terminal:
+
+```powershell
+kubectl port-forward service/student-api 5000:5000 -n student-api
+```
+
+In another terminal:
+
+```powershell
+Invoke-RestMethod http://localhost:5000/healthcheck
+```
+
+The expected health status is `UP`. Stop port forwarding with `Ctrl+C` when finished.
+
+## Persistent Storage Safety
+
+PostgreSQL uses persistent storage. Verify that `data-postgres-0` remains `Bound` after deployment and upgrades. Do not delete the PVC or force-replace the StatefulSet as a routine troubleshooting step, because this can risk database availability or data loss.

@@ -1,0 +1,11 @@
+Student API Helm chart installed.
+
+Service: {{ include "student-api.fullname" . }}
+Namespace: {{ .Release.Namespace }}
+Port: {{ .Values.service.port }}
+
+Check deployment status:
+kubectl get deployment -n {{ .Release.Namespace }}
+
+Check API pods:
+kubectl get pods -n {{ .Release.Namespace }}

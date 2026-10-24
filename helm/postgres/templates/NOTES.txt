@@ -1,0 +1,9 @@
+PostgreSQL Helm chart installed.
+
+StatefulSet: postgres
+Headless Service: postgres
+Namespace: {{ .Release.Namespace }}
+Port: {{ .Values.service.port }}
+
+Check status:
+kubectl get statefulset,service,pvc -n {{ .Release.Namespace }}
