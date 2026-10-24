@@ -1,0 +1,102 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: student-api
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: student-api-config
+  namespace: student-api
+data:
+  DB_HOST: "postgres"
+  DB_PORT: "5432"
+  DB_NAME: "studentdb"
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: student-api
+  namespace: student-api
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: student-api
+  template:
+    metadata:
+      labels:
+        app: student-api
+    spec:
+      nodeSelector:
+        type: application
+      tolerations:
+        - key: node-role.kubernetes.io/control-plane
+          operator: Exists
+          effect: NoSchedule
+      initContainers:
+        - name: database-migration
+          image: student-api:1.0.0
+          imagePullPolicy: IfNotPresent
+          command: ["flask", "--app", "run.py", "db", "upgrade"]
+          envFrom:
+            - configMapRef:
+                name: student-api-config
+          env:
+            - name: DB_USER
+              valueFrom:
+                secretKeyRef:
+                  name: student-api-db-secret
+                  key: username
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: student-api-db-secret
+                  key: password
+      containers:
+        - name: student-api
+          image: student-api:1.0.0
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: http
+              containerPort: 5000
+          envFrom:
+            - configMapRef:
+                name: student-api-config
+          env:
+            - name: DB_USER
+              valueFrom:
+                secretKeyRef:
+                  name: student-api-db-secret
+                  key: username
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: student-api-db-secret
+                  key: password
+          readinessProbe:
+            httpGet:
+              path: /healthcheck
+              port: http
+            initialDelaySeconds: 5
+            periodSeconds: 5
+          livenessProbe:
+            httpGet:
+              path: /healthcheck
+              port: http
+            initialDelaySeconds: 15
+            periodSeconds: 10
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: student-api
+  namespace: student-api
+spec:
+  type: ClusterIP
+  selector:
+    app: student-api
+  ports:
+    - name: http
+      port: 5000
+      targetPort: http

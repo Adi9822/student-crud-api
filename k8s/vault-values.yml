@@ -1,0 +1,14 @@
+﻿server:
+  nodeSelector:
+    type: dependent_services
+  dev:
+    enabled: true
+
+injector:
+  enabled: false
+
+csi:
+  enabled: false
+
+ui:
+  enabled: false

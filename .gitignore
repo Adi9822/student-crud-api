@@ -2,3 +2,13 @@
 .env
 __pycache__/
 .pytest_cache/
+# Local development and generated files
+.vagrant/
+debug.log
+debug2.log
+requirements.txt.backup
+k8s/vault-rendered.yml
+
+# Optional local Vagrant environment
+Vagrantfile
+scripts/

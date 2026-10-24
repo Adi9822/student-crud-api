@@ -1,7 +1,9 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
+from flask_migrate import Migrate
 
 db = SQLAlchemy()
+migrate = Migrate()
 
 
 def create_app():
@@ -13,6 +15,7 @@ def create_app():
     )
 
     db.init_app(app)
+    migrate.init_app(app, db)
 
     from app.models.student import Student  # noqa: F401
     from app.routes.student_routes import student_bp

@@ -441,3 +441,113 @@ Student CRUD REST API Project built for learning:
 * CI/CD
 * Kubernetes
 * Cloud Engineering
+
+# Kubernetes Deployment (Milestones 6–7)
+
+## Architecture
+
+The Student CRUD REST API runs in Kubernetes with:
+- Flask REST API exposed through a Kubernetes Service.
+- PostgreSQL deployed as a StatefulSet with persistent storage.
+- ConfigMap for database configuration.
+- HashiCorp Vault and External Secrets Operator (ESO) for database credentials.
+- Database migrations executed by an init container before the API starts.
+- Health checks using `/healthcheck`.
+
+## Prerequisites
+
+Install Docker, kubectl, Minikube, and Helm.
+
+## Kubernetes Node Placement
+
+The cluster uses these node labels:
+
+- `type=application` — Student API
+- `type=database` — PostgreSQL
+- `type=dependent_services` — Vault and dependent services
+
+Check node labels:
+
+```powershell
+kubectl get nodes --show-labels
+```
+
+## Deploy PostgreSQL and Secrets
+
+Install External Secrets Operator and HashiCorp Vault before deploying the application. Configure Vault with the database username and password, create a read-only Vault policy, and configure the ESO token Secret. Never commit credentials or tokens to GitHub.
+
+Apply the secret store and database manifests:
+
+```powershell
+kubectl apply -f .\k8s\external-secrets.yml
+kubectl apply -f .\k8s\database.yml
+kubectl get externalsecret -n student-api
+kubectl get pods,pvc -n student-api
+```
+
+Wait until the database is running and its external Secret is synchronized.
+
+## Deploy the Student API
+
+Build and load the Docker image into Minikube:
+
+```powershell
+docker build -t student-api:1.0.0 .
+minikube image load student-api:1.0.0 -p sre-bootcamp
+```
+
+Apply the API manifest:
+
+```powershell
+kubectl apply -f .\k8s\application.yml
+kubectl rollout status deployment/student-api -n student-api --timeout=180s
+kubectl get pods,services -n student-api
+```
+
+The API's init container runs database migrations before the application starts.
+
+## Access and Test the API
+
+Start port forwarding in a separate PowerShell window:
+
+```powershell
+kubectl port-forward -n student-api service/student-api 5000:5000
+```
+
+In another PowerShell window, test the health endpoint:
+
+```powershell
+Invoke-RestMethod -Uri 'http://127.0.0.1:5000/healthcheck'
+```
+
+Expected response:
+
+```json
+{"status":"UP"}
+```
+
+## API Endpoints
+
+| Method | Endpoint | Purpose |
+|---|---|---|
+| GET | `/healthcheck` | Health check |
+| POST | `/api/v1/students` | Create a student |
+| GET | `/api/v1/students` | List students |
+| GET | `/api/v1/students/<id>` | Get a student |
+| PUT | `/api/v1/students/<id>` | Update a student |
+| DELETE | `/api/v1/students/<id>` | Delete a student |
+
+Use the Postman collection at `postman/Student CRUD API.postman_collection.json` to test the endpoints.
+
+## Troubleshooting
+
+```powershell
+kubectl get pods -A
+kubectl get events -n student-api
+kubectl logs deployment/student-api -n student-api
+kubectl describe externalsecret student-api-db-credentials -n student-api
+```
+
+Do not commit passwords, Vault tokens, or `.env` files to GitHub.
+
+**Note:** The Vault development configuration is for learning only. Its in-memory data may be lost when Vault restarts.

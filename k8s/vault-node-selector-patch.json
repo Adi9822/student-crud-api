@@ -1,0 +1,11 @@
+{
+  "spec": {
+    "template": {
+      "spec": {
+        "nodeSelector": {
+          "type": "dependent_services"
+        }
+      }
+    }
+  }
+}
