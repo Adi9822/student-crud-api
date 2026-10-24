@@ -35,20 +35,17 @@ jobs:
       - name: Diagnose Docker Access
         continue-on-error: true
         shell: powershell
+        env:
+          DOCKER_HOST: npipe:////./pipe/dockerDesktopLinuxEngine
         run: |
           Write-Host "=== Runner identity ==="
           whoami
-
-          Write-Host "=== Docker context ==="
-          docker context show
-
-          Write-Host "=== Docker environment settings ==="
-          Get-ChildItem Env:DOCKER_* -ErrorAction SilentlyContinue
-
-          Write-Host "=== Docker client and server access ==="
+          Write-Host "=== Docker endpoint ==="
           docker version
 
       - name: Build API
+        env:
+          DOCKER_HOST: npipe:////./pipe/dockerDesktopLinuxEngine
         run: docker build -t student-api:1.0.0 .
 
       - name: Start Database
